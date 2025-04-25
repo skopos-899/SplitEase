@@ -566,10 +566,17 @@ function initModals() {
     const modalGroupName = document.getElementById('modalGroupName');
     
     viewGroupBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
             const groupName = this.closest('.group-card').querySelector('h3').textContent;
+            const groupId = this.getAttribute('data-group');
+            
+            console.log(`Opening group details for: ${groupName} (${groupId})`);
+            
             modalGroupName.textContent = groupName;
-            populateGroupDetails(this.getAttribute('data-group'));
+            populateGroupDetails(groupId);
             openModal(groupDetailModal);
         });
     });
@@ -901,12 +908,14 @@ function initModals() {
     function openModal(modal) {
         closeAllModals(); // Close any open modals first
         modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
     }
     
     function closeAllModals() {
         modals.forEach(modal => {
             modal.style.display = 'none';
         });
+        document.body.style.overflow = ''; // Restore scrolling
     }
 }
 
@@ -1089,6 +1098,32 @@ function initGroupsPage() {
         // Close the modal
         document.getElementById('addExpenseModal').style.display = 'none';
     });
+
+    // Add Member button in group detail
+    const addMemberBtn = document.getElementById('addMemberBtn');
+    
+    if (addMemberBtn) {
+        addMemberBtn.addEventListener('click', function() {
+            // Get the members list
+            const groupMembersList = document.getElementById('groupMembersList');
+            
+            // Create new member item
+            const memberItem = document.createElement('div');
+            memberItem.className = 'member-item';
+            memberItem.innerHTML = `
+                <img src="https://randomuser.me/api/portraits/lego/1.jpg" class="member-avatar">
+                <div class="member-info">
+                    <h4>New Member</h4>
+                    <p>member@example.com</p>
+                </div>
+            `;
+            
+            // Add to the members list
+            groupMembersList.appendChild(memberItem);
+            
+            alert('New member added successfully!');
+        });
+    }
 }
 
 // Function to update dashboard stats when a new group is added
